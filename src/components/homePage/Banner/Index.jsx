@@ -4,9 +4,13 @@ import "slick-carousel/slick/slick.css";
 import Slider from "react-slick";
 import { LiaAngleRightSolid } from "react-icons/lia";
 import Bannerimg from "../../../assets/banner/banner.jpg";
-import { useGetAllBannerQuery } from "../../../Features/Api/exclusiveApi";
+import {
+  useGetAllBannerQuery,
+  useGetAllCategoryQuery,
+} from "../../../Features/Api/exclusiveApi";
 const Banner = () => {
   const [currentSlide, setcurrentSlide] = useState(0);
+  const [dropdown, setdropdown] = useState(null);
   const settings = {
     dots: true,
     infinite: true,
@@ -59,9 +63,15 @@ const Banner = () => {
     },
   };
 
-  const {data , isLoading , isError} = useGetAllBannerQuery();
-  
-  
+  const { data, isLoading, isError } = useGetAllBannerQuery();
+  const categoryData = useGetAllCategoryQuery();
+  console.log(categoryData?.data?.data);
+
+  const handledropdown = (id) => {
+    setdropdown((prev) => {
+      return prev == id ? null : id;
+    });
+  };
 
   return (
     <div>
@@ -69,16 +79,32 @@ const Banner = () => {
         <div className="flex  justify-between">
           <div className="w-[23%]  pt-10 border-r-[1.5px] border-r-text_black7D8184">
             <ul>
-              {category?.map((item) => (
-                <div className="flex items-center justify-between hover:bg-gray-200 transition-all">
-                  <li className="font-popins hover:px-5 transition-all text-md text-text_black000000 font-normal py-3 cursor-pointer">
-                    {item.category}
-                  </li>
-                  {item.subCategory && (
-                    <span className="pr-10 text-xl text-text_black000000">
-                      <LiaAngleRightSolid />
-                    </span>
-                  )}
+              {categoryData?.data?.data?.map((item) => (
+                <div className="flex flex-col items-start justify-between transition-all">
+                  <div
+                    className="flex  items-center justify-between w-full pr-5 cursor-pointer hover:bg-gray-200"
+                    onClick={() => handledropdown(item._id)}
+                  >
+                    <li className="font-popins hover:px-5 transition-all text-md text-text_black000000 font-normal py-3 cursor-pointer">
+                      {item.name}
+                    </li>
+                    {item.subcategory?.length > 0 && <LiaAngleRightSolid />}
+                  </div>
+
+                  <div
+                    className={`${dropdown == item._id ? "block" : "hidden"}`}
+                  >
+                    {item.subcategory &&
+                      item.subcategory.map((subitem) => (
+                        <div>
+                          <ul className="mb-4">
+                            <li className="bg-gray-300 py-2 rounded px-5">
+                              {subitem.name}
+                            </li>
+                          </ul>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               ))}
             </ul>

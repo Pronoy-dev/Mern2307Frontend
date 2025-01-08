@@ -6,9 +6,12 @@ export const exlusiveApi = createApi({
     endpoints: (builder) => ({
       GetAllBanner  : builder.query({
         query: ()=>`/banner`
+      }),
+      GetAllCategory : builder.query({
+        query: ()=> `/category`
       })
     }),
   })
 
-  export const { useGetAllBannerQuery } = exlusiveApi
+  export const { useGetAllBannerQuery  ,useGetAllCategoryQuery} = exlusiveApi
   
