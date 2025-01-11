@@ -65,7 +65,7 @@ const Banner = () => {
 
   const { data, isLoading, isError } = useGetAllBannerQuery();
   const categoryData = useGetAllCategoryQuery();
-  console.log(categoryData?.data?.data);
+
 
   const handledropdown = (id) => {
     setdropdown((prev) => {

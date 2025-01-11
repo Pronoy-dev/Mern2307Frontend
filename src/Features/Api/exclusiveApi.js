@@ -9,9 +9,17 @@ export const exlusiveApi = createApi({
       }),
       GetAllCategory : builder.query({
         query: ()=> `/category`
+      }),
+      GetAllFlashSale : builder.query({
+        query:()=> `/flashsale`
       })
+      ,
+      GetAllProduct : builder.query({
+        query: ()=>`/product`
+      })
+
     }),
   })
 
-  export const { useGetAllBannerQuery  ,useGetAllCategoryQuery} = exlusiveApi
+  export const { useGetAllBannerQuery  ,useGetAllCategoryQuery , useGetAllFlashSaleQuery , useGetAllProductQuery} = exlusiveApi
   

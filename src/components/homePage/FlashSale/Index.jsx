@@ -1,10 +1,17 @@
 import React, { useEffect } from "react";
 import ProductCommonLayout from "../../CommonCoponents/ProductCommonLayout";
 import ProductCard from "../../CommonCoponents/ProductCard";
-import { useGetAllProductQuery } from "../../../Features/Api/ProductApi";
+import { useGetAllFlashSaleQuery } from "../../../Features/Api/exclusiveApi";
 const FlashSale = () => {
-  const { data, error, isLoading } = useGetAllProductQuery();
+  const { data, error, isLoading } = useGetAllFlashSaleQuery();
+  
+  
+  const flashSaleProduct =   data?.data?.map((item)=> {
+    return item.product;
+  })
 
+
+  
   return (
     <div className="container">
       <div className="flex flex-col items-center border-b-[1px] border-b-black_363738 mb-10">
@@ -15,8 +22,8 @@ const FlashSale = () => {
           isArrowsTrue={true}
           heading="Today's"
           description="Flash Sales"
-          partialItemShow={8}
-          componentData={data?.products}
+          partialItemShow={4}
+          componentData={flashSaleProduct}
           isLoading={isLoading}
         />
         <div className="pb-20 ">

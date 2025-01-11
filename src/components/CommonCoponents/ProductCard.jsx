@@ -6,6 +6,7 @@ import useCalculateDiscount from "../../hooks/useCalculateDiscount";
 import Star from "./Star";
 import { Link, useNavigate } from "react-router-dom";
 const ProductCard = ({ itemData }) => {
+
   return (
     <div className="mt-10 ">
       <Link to={`/productdetails/${itemData.id}`}>
@@ -24,7 +25,7 @@ const ProductCard = ({ itemData }) => {
             <div className="flex justify-between cursor-pointer">
               <div className="w-[172] h-[152px] flex-1 ">
                 <img
-                  src={itemData ? itemData.thumbnail : image}
+                  src={itemData ? itemData.image[0] : image}
                   alt={image}
                   className="h-full w-full object-contain"
                 />
@@ -39,15 +40,15 @@ const ProductCard = ({ itemData }) => {
           </div>
           <div className="flex flex-col items-start gap-y-2 mt-4">
             <h2 className="text-lg font-popins font-medium cursor-pointer w-full truncate ">
-              {itemData ? itemData.title : "HAVIT HV-G92 Gamepad"}
+              {itemData ? itemData.name : "HAVIT HV-G92 Gamepad"}
             </h2>
             <div className="flex items-center gap-x-3 cursor-pointer">
               <span className="text-redDB4444 font-medium text-lg font-popins inline-block">
-                $
-                {useCalculateDiscount(
+                $ 5%
+                {/* {useCalculateDiscount(
                   itemData?.price,
                   itemData?.discountPercentage
-                ).toFixed(2)}
+                ).toFixed(2)} */}
               </span>
               <span className="text-text_black000000 opacity-50 font-medium text-lg font-popins inline-block line-through">
                 ${itemData ? itemData.price.toFixed(2) : 0}
@@ -57,7 +58,7 @@ const ProductCard = ({ itemData }) => {
               <div className="flex items-center gap-x-1 cursor-pointer">
                 <Star rating={itemData && itemData.rating} />
 
-                <h3 className="text-text_black000000 opacity-50 font-medium text-lg font-popins ">{`(${itemData?.reviews?.length})`}</h3>
+                <h3 className="text-text_black000000 opacity-50 font-medium text-lg font-popins ">{`(${itemData?.review?.length})`}</h3>
               </div>
             </div>
           </div>
