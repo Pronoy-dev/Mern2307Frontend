@@ -5,7 +5,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 import useCalculateDiscount from "../../../hooks/useCalculateDiscount";
 const SpecificProductDetails = ({ ProductDetailsData }) => {
   const {
-    title,
+    name,
     description,
     rating,
     price,
@@ -13,8 +13,8 @@ const SpecificProductDetails = ({ ProductDetailsData }) => {
     warrantyInformation,
     returnPolicy,
     discountPercentage,
-
-    reviews,
+    size,
+    review,
   } = ProductDetailsData;
 
   const sizes = [
@@ -24,16 +24,17 @@ const SpecificProductDetails = ({ ProductDetailsData }) => {
     { id: 4, size: "L" },
     { id: 5, size: "XL" },
   ];
+
   return (
     <div>
       <div className="">
         <h2 className="text-2xl font-semibold font-inter text-text_black000000">
-          {title || "Havic HV G-92 Gamepad"}
+          {name || "Havic HV G-92 Gamepad"}
         </h2>
         <div className="flex items-start gap-x-3 mt-4">
           <Star rating={rating} />
           <span className="inline-block text-text_black000000 font-normal font-popins text-md opacity-50">
-            {reviews?.length} Review
+            {review?.length} Review
           </span>
           <span className="inline-block  text-text_black000000 opacity-50">
             {" "}
@@ -72,13 +73,19 @@ const SpecificProductDetails = ({ ProductDetailsData }) => {
           </h2>
 
           <div className="flex items-center gap-x-3 ">
-            {sizes.map((size) => (
-              <div className="border-2 border-x-gray-300 rounded  w-[36px] h-[36px] flex items-center justify-center ">
+            {sizes.map((sizein) => (
+              <div
+                className={
+                  sizein.size?.toLowerCase() == size.toLowerCase()
+                    ? "border-2  border-x-gray-300 rounded  bg-redDB4444 w-[36px] h-[36px] flex items-center justify-center "
+                    : "border-2  border-x-gray-300 rounded   w-[36px] h-[36px] flex items-center justify-center "
+                }
+              >
                 <span
                   className="inline-block text-[14px] font-bold  font-popins "
-                  key={size.id}
+                  key={sizein.id}
                 >
-                  {size.size}
+                  {sizein.size}
                 </span>
               </div>
             ))}
