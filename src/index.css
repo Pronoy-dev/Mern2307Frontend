@@ -97,7 +97,7 @@
   }
   .amount::after {
     position: absolute;
-    content: "0";
+    content: attr(data-amout);
     left: 39%;
     top: -52%;
     width: 25px;

@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BreadCrumb } from "../../components/CommonCoponents/BreadCrumb.jsx";
 import productOne from "../../../src/assets/cart/p1.png";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { removeCartItem } from "../../Features/AllSlice/productSlice.js";
+import { removeCartItem  ,incrementQuantity ,decrementQuantity ,getTotal} from "../../Features/AllSlice/productSlice.js";
 import { Link } from "react-router-dom";
 const AddToCart = () => {
   const dispatch = useDispatch();
-  const Cartitem = useSelector((state) => state.cartproduct.value);
+  useEffect(()=> {
+  dispatch(getTotal())
+  }, [  localStorage.getItem('cart')])
+
+  const {totalamount , totalItem , value} = useSelector((state) => state.cartproduct);
+
 
   /**
    * handleremoveCart funtion implement
@@ -17,6 +22,10 @@ const AddToCart = () => {
     dispatch(removeCartItem(item));
   };
 
+  
+  const handleIncrement = (item)=> {
+    dispatch(incrementQuantity(item))
+  }  
   return (
     <div className="my-20">
       <div className="container">
@@ -47,7 +56,7 @@ const AddToCart = () => {
 
         {/* carti tem */}
         <div className="custom_scrollbar w-full h-[500px] overflow-y-scroll ">
-          {Cartitem?.length == 0 ? (
+          {value?.length == 0 ? (
             <div class=" flex justify-center items-center">
               <div class="relative inline-flex  group">
                 <div class="absolute transitiona-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
@@ -61,7 +70,7 @@ const AddToCart = () => {
               </div>
             </div>
           ) : (
-            Cartitem?.map((item) => (
+            value?.map((item) => (
               <div className="mb-10" key={item._id}>
                 <div className="flex justify-between shadow-lg rounded">
                   <div className="flex-1 py-6  flex justify-start">
@@ -91,15 +100,15 @@ const AddToCart = () => {
                     <div className="flex items-center justify-center gap-x-3 w-[100px] rounded border border-gray-400">
                       <input
                         type="text"
-                        value={item.quantitiy}
+                        value={item.quantity}
                         className=" w-[25px] text-[20px] font-popins font-normal text-text_black000000"
                       />
                       <div className="flex flex-col items-center justify-center">
-                        <span className="">
+                        <span className="" onClick={()=> handleIncrement(item)}>
                           <IoIosArrowUp className="inline-block  cursor-pointer" />
                         </span>
 
-                        <span className="">
+                        <span className="" onClick={()=> dispatch(decrementQuantity(item))}>
                           <IoIosArrowDown className="inline-block  cursor-pointer" />
                         </span>
                       </div>
@@ -154,7 +163,7 @@ const AddToCart = () => {
                 <button type="button">Subtotal:</button>
                 <span className="inline-block font-popins font-normal text-text_black000000 text-[16px]">
                   {" "}
-                  $1750
+                  ${totalItem}
                 </span>
               </div>
 
@@ -162,7 +171,7 @@ const AddToCart = () => {
                 <button type="button">Shipping:</button>
                 <span className="inline-block font-popins font-normal text-text_black000000 text-[16px]">
                   {" "}
-                  $1750
+                  $0
                 </span>
               </div>
 
@@ -170,7 +179,7 @@ const AddToCart = () => {
                 <button type="button">Total:</button>
                 <span className="inline-block font-popins font-normal text-text_black000000 text-[16px]">
                   {" "}
-                  $1750
+                  ${totalamount}
                 </span>
               </div>
             </div>
