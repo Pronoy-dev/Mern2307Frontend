@@ -1,7 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import { ErrorToast, InfoToast, SuessToast } from "../../helpers/Toast";
 const SignUP = () => {
+  const [loading, setloading] = useState(false)
+  const [signup, setsignup] = useState({
+    firstName: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+    PasswordConfirmation: "",
+    agree: false
+  })
+
+  // onchnage
+  const handlechange = (e) => {
+    const { id, value } = e.target;
+    setsignup({
+      ...signup,
+      [id]: [id] == "agree" ? !signup.agree : value
+    })
+  }
+
+  /**
+   * todo: handleSignup
+   * @param ({})
+   */
+  const handleSignup = async () => {
+    const { firstName, email, phoneNumber, password, PasswordConfirmation, agree } = signup;
+    if (password !== PasswordConfirmation) {
+      ErrorToast('Password not match')
+    }
+    if (!agree) {
+      ErrorToast('fillup the agreemnet')
+    }
+    setloading(true)
+    try {
+      const response = await axios.post('http://localhost:3000/api/v1/auth/registration', {
+        firstName: firstName,
+        email: email,
+        phoneNumber: phoneNumber,
+        password: password
+      })
+
+      if(response.statusText.toLocaleLowerCase() == "Ok".toLocaleLowerCase()){
+        InfoToast(`${response.data.data.firstName} Please Check Your Email `)
+        SuessToast(response.data.messsage)
+      }
+
+    } catch (error) {
+      console.error('error from signup page ', error)
+    } finally {
+      setloading(false)
+    }
+  }
+
+
   return (
     <div className="my-20">
       {/* <!-- component --> */}
@@ -73,10 +127,10 @@ const SignUP = () => {
                 </p>
               </div>
 
-              <form action="#" class="mt-8 grid grid-cols-6 gap-6">
+              <form action="#" class="mt-8 grid grid-cols-6 gap-6" onSubmit={(e) => e.preventDefault()}>
                 <div class="col-span-6 sm:col-span-3">
                   <label
-                    for="FirstName"
+                    for="firstName"
                     class="block text-sm font-medium text-gray-700"
                   >
                     First Name
@@ -84,31 +138,34 @@ const SignUP = () => {
 
                   <input
                     type="text"
-                    id="FirstName"
-                    name="first_name"
+                    id="firstName"
+                    name="firstName"
+                    onChange={handlechange}
+                    value={signup.firstName}
                     class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
                   />
                 </div>
 
                 <div class="col-span-6 sm:col-span-3">
                   <label
-                    for="LastName"
+                    for="phoneNumber"
                     class="block text-sm font-medium text-gray-700"
                   >
-                    Last Name
+                    phoneNumber
                   </label>
 
                   <input
                     type="text"
-                    id="LastName"
-                    name="last_name"
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    onChange={handlechange}
                     class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
                   />
                 </div>
 
                 <div class="col-span-6">
                   <label
-                    for="Email"
+                    for="email"
                     class="block text-sm font-medium text-gray-700"
                   >
                     {" "}
@@ -117,7 +174,8 @@ const SignUP = () => {
 
                   <input
                     type="email"
-                    id="Email"
+                    id="email"
+                    onChange={handlechange}
                     name="email"
                     class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
                   />
@@ -125,16 +183,17 @@ const SignUP = () => {
 
                 <div class="col-span-6 sm:col-span-3">
                   <label
-                    for="Password"
+                    for="password"
                     class="block text-sm font-medium text-gray-700"
                   >
                     {" "}
-                    Password{" "}
+                    password{" "}
                   </label>
 
                   <input
                     type="password"
-                    id="Password"
+                    id="password"
+                    onChange={handlechange}
                     name="password"
                     class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
                   />
@@ -151,7 +210,8 @@ const SignUP = () => {
                   <input
                     type="password"
                     id="PasswordConfirmation"
-                    name="password_confirmation"
+                    onChange={handlechange}
+                    name="PasswordConfirmation"
                     class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
                   />
                 </div>
@@ -160,8 +220,9 @@ const SignUP = () => {
                   <label for="MarketingAccept" class="flex gap-4">
                     <input
                       type="checkbox"
-                      id="MarketingAccept"
-                      name="marketing_accept"
+                      id="agree"
+                      name="agree"
+                      onChange={handlechange}
                       class="size-5 rounded-md border-gray-200 bg-white shadow-sm"
                     />
 
@@ -188,9 +249,13 @@ const SignUP = () => {
                 </div>
 
                 <div class="col-span-6 sm:flex sm:items-center sm:gap-4">
-                  <button class="inline-block shrink-0 rounded-md border  bg-redDB4444 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
+                  {loading ? (<button class="inline-block shrink-0 rounded-md border  bg-redDB4444 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500" >
+                    loading ...
+                  </button>
+                  ) : (<button class="inline-block shrink-0 rounded-md border  bg-redDB4444 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500" onClick={handleSignup}>
                     Create an account
                   </button>
+                  )}
 
                   <p class="mt-4 text-sm text-gray-500 sm:mt-0">
                     Already have an account?
