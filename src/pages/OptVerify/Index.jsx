@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { axiosinstance } from '../../helpers/axios'
 import { ErrorToast } from '../../helpers/Toast'
 
@@ -9,6 +9,7 @@ const OtpVerify = () => {
     const [loading, setloading] = useState(false)
     const [otp, setotp] = useState(null)
     const { email } = params;
+    const navigate = useNavigate()
 
 
     const handleOtp = async () => {
@@ -19,10 +20,13 @@ const OtpVerify = () => {
                 otp: otp
             })
 
-            if(response.statusText.toLocaleLowerCase() === "oK".toLocaleLowerCase()){
-                console.log(response.data);
-                
+            if (response.statusText.toLocaleLowerCase() === "oK".toLocaleLowerCase()) {
+                alert("Otp Vrified")
+                setTimeout(()=> {
+                    navigate('/login')
+                }, 1000)
             }
+           
 
         } catch (error) {
             ErrorToast(error.response.data.error)
@@ -30,6 +34,29 @@ const OtpVerify = () => {
         }
         finally {
             setloading(false)
+        }
+    }
+
+    // resnendopt
+    // resnendopt
+    // resnendopt
+    const  resnendopt = async(req,res)=> {
+        try {
+            // setloading(true)
+            const response = await axiosinstance.post('auth/resendotp', {
+                email: email,
+            })
+
+            if (response.statusText.toLocaleLowerCase() === "oK".toLocaleLowerCase()) {
+                console.log(response.data);
+            }
+
+        } catch (error) {
+            ErrorToast(error.response.data.error)
+            console.error("error from handleopt ", error)
+        }
+        finally {
+            // setloading(false)
         }
     }
 
@@ -47,11 +74,15 @@ const OtpVerify = () => {
                         class="flex px-3 py-2 md:px-4 md:py-3 border-2 border-black rounded-lg font-medium placeholder:font-normal" onChange={(e) => setotp(e.target.value)} value={otp} />
                     {loading ? (<button class="flex items-center justify-center flex-none px-3 py-2 md:px-4 md:py-3 border-2 rounded-lg font-medium border-black bg-black text-white">
                         loading ...
-                    </button>) : (<button class="flex items-center justify-center flex-none px-3 py-2 md:px-4 md:py-3 border-2 rounded-lg font-medium border-black bg-black text-white" onClick={handleOtp}>
+                    </button>) : (<button class="flex items-center justify-center flex-none px-3 py-2 md:px-4 md:py-3 border-2 rounded-lg font-medium border-black bg-black text-white" onClick={ handleOtp}>
                         Confirm
                     </button>)}
 
                 </div>
+
+                <button class="flex items-center justify-center flex-none px-3 py-2 md:px-4 md:py-3 border-2 rounded-lg font-medium border-black bg-black text-white" onClick={resnendopt}>
+                    Resend Opt
+                </button>
             </div>
         </div>
     )

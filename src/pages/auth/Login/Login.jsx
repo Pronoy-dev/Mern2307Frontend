@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import { loginSchema } from "../../../Validation/Schema/LoginSchema";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { axiosinstance } from "../../../helpers/axios";
 const Login = () => {
   const [eye, setEye] = useState(false);
   const initialValue = {
@@ -13,8 +14,23 @@ const Login = () => {
   const formik = useFormik({
     initialValues: initialValue,
     validationSchema: loginSchema,
-    onSubmit: (value) => {
-      console.log(value);
+    onSubmit: async (value) => {
+      const { emailorphone, Password } = value
+      try {
+        const resposne = await axiosinstance.post('auth/login', {
+
+          eamilOrphoneNumber: emailorphone,
+          password: Password
+
+        } , {
+          withCredentials: true
+        })
+
+        console.log(resposne);
+        
+      } catch (error) {
+
+      }
     },
   });
   return (
