@@ -3,29 +3,41 @@ import { BreadCrumb } from "../../components/CommonCoponents/BreadCrumb.jsx";
 import productOne from "../../../src/assets/cart/p1.png";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { removeCartItem  ,incrementQuantity ,decrementQuantity ,getTotal} from "../../Features/AllSlice/productSlice.js";
+import {
+  removeCartItem,
+  incrementQuantity,
+  decrementQuantity,
+  getTotal,
+} from "../../Features/AllSlice/productSlice.js";
 import { Link } from "react-router-dom";
+import {
+  useGetuserCartItemQuery,
+  useRemoveCartMutation,
+} from "../../Features/Api/exclusiveApi.js";
 const AddToCart = () => {
-  const dispatch = useDispatch();
-  useEffect(()=> {
-  dispatch(getTotal())
-  }, [  localStorage.getItem('cart')])
+  const { data, isLoading, isError } = useGetuserCartItemQuery();
+  const [removeCart] = useRemoveCartMutation();
 
-  const {totalamount , totalItem , value} = useSelector((state) => state.cartproduct);
-
+  const { totalamount, totalItem, value } = useSelector(
+    (state) => state.cartproduct
+  );
 
   /**
    * handleremoveCart funtion implement
    * @param ({item})
    */
-  const handleremoveCart = (item) => {
-    dispatch(removeCartItem(item));
+  const handleremoveCart = async ({ _id }) => {
+    try {
+      const response = await removeCart(_id);
+      if (response) {
+        SuessToast("Cart Removed Sucesfull");
+      }
+    } catch (error) {
+      console.error("error from cart remove cart funtion", error);
+    }
   };
+  console.log(data?.data);
 
-  
-  const handleIncrement = (item)=> {
-    dispatch(incrementQuantity(item))
-  }  
   return (
     <div className="my-20">
       <div className="container">
@@ -56,7 +68,7 @@ const AddToCart = () => {
 
         {/* carti tem */}
         <div className="custom_scrollbar w-full h-[500px] overflow-y-scroll ">
-          {value?.length == 0 ? (
+          {data?.data?.userCartItem?.length == 0 ? (
             <div class=" flex justify-center items-center">
               <div class="relative inline-flex  group">
                 <div class="absolute transitiona-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] rounded-xl blur-lg group-hover:opacity-100 group-hover:-inset-1 group-hover:duration-200 animate-tilt"></div>
@@ -70,13 +82,13 @@ const AddToCart = () => {
               </div>
             </div>
           ) : (
-            value?.map((item) => (
+            data?.data?.userCartItem?.map((item) => (
               <div className="mb-10" key={item._id}>
                 <div className="flex justify-between shadow-lg rounded">
                   <div className="flex-1 py-6  flex justify-start">
                     <div className="flex pl-10 items-center gap-x-5 relative ">
                       <img
-                        src={item?.image[0]}
+                        src={item?.product?.image[0]}
                         alt={productOne}
                         className="w-[54px] h-[54px] object-contain"
                       />
@@ -87,13 +99,13 @@ const AddToCart = () => {
                         X
                       </span>
                       <h1 className="text-[16px] font-popins font-normal text-text_black000000 ">
-                        {item?.name}
+                        {item?.product.name}
                       </h1>
                     </div>
                   </div>
                   <div className=" flex-1  py-6 flex justify-center">
                     <h1 className="text-[20px] font-popins font-normal text-text_black000000">
-                      ${item.price}
+                      ${item.product.price}
                     </h1>
                   </div>
                   <div className=" flex-1  py-6 flex   justify-center">
@@ -104,11 +116,17 @@ const AddToCart = () => {
                         className=" w-[25px] text-[20px] font-popins font-normal text-text_black000000"
                       />
                       <div className="flex flex-col items-center justify-center">
-                        <span className="" onClick={()=> handleIncrement(item)}>
+                        <span
+                          className=""
+                          onClick={() => handleIncrement(item)}
+                        >
                           <IoIosArrowUp className="inline-block  cursor-pointer" />
                         </span>
 
-                        <span className="" onClick={()=> dispatch(decrementQuantity(item))}>
+                        <span
+                          className=""
+                          onClick={() => dispatch(decrementQuantity(item))}
+                        >
                           <IoIosArrowDown className="inline-block  cursor-pointer" />
                         </span>
                       </div>
@@ -116,7 +134,7 @@ const AddToCart = () => {
                   </div>
                   <div className=" flex-1 flex justify-end py-6">
                     <h1 className="text-[20px] font-popins font-normal text-text_black000000 pr-10">
-                      ${item.quantity * item.price}
+                      ${item.quantity * item.product.price}
                     </h1>
                   </div>
                 </div>
@@ -163,7 +181,7 @@ const AddToCart = () => {
                 <button type="button">Subtotal:</button>
                 <span className="inline-block font-popins font-normal text-text_black000000 text-[16px]">
                   {" "}
-                  ${totalItem}
+                  ${data?.data?.totalPrice}
                 </span>
               </div>
 
@@ -179,14 +197,17 @@ const AddToCart = () => {
                 <button type="button">Total:</button>
                 <span className="inline-block font-popins font-normal text-text_black000000 text-[16px]">
                   {" "}
-                  ${totalamount}
+                  ${data?.data?.totaitem}
                 </span>
               </div>
             </div>
             <div className="w-full  flex justify-center mt-10">
-              <button className="px-[48px] py-[12px] bg-redDB4444  text-white_FFFFFF text-[18px] font-medium font-popins rounded">
+              <Link
+                to={"/checkout"}
+                className="px-[48px] py-[12px] bg-redDB4444  text-white_FFFFFF text-[18px] font-medium font-popins rounded"
+              >
                 Procees to checkout
-              </button>
+              </Link>
             </div>
           </div>
         </div>

@@ -3,9 +3,10 @@ import login from "../../../assets/login/login.gif";
 import { useFormik } from "formik";
 import { loginSchema } from "../../../Validation/Schema/LoginSchema";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { axiosinstance } from "../../../helpers/axios";
 const Login = () => {
+  const navigate = useNavigate();
   const [eye, setEye] = useState(false);
   const initialValue = {
     emailorphone: "",
@@ -15,22 +16,24 @@ const Login = () => {
     initialValues: initialValue,
     validationSchema: loginSchema,
     onSubmit: async (value) => {
-      const { emailorphone, Password } = value
+      const { emailorphone, Password } = value;
       try {
-        const resposne = await axiosinstance.post('auth/login', {
+        const resposne = await axiosinstance.post(
+          "auth/login",
+          {
+            eamilOrphoneNumber: emailorphone,
+            password: Password,
+          },
+          {
+            withCredentials: true,
+          }
+        );
 
-          eamilOrphoneNumber: emailorphone,
-          password: Password
-
-        } , {
-          withCredentials: true
-        })
-
+        if (resposne) {
+          navigate("/");
+        }
         console.log(resposne);
-        
-      } catch (error) {
-
-      }
+      } catch (error) {}
     },
   });
   return (

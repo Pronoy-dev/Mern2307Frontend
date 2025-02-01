@@ -3,7 +3,12 @@ import Star from "../../CommonCoponents/Star";
 import { IoIosHeartEmpty } from "react-icons/io";
 import { TbTruckDelivery } from "react-icons/tb";
 import useCalculateDiscount from "../../../hooks/useCalculateDiscount";
+import { useAddtoCartMutation } from "../../../Features/Api/exclusiveApi";
+import { useParams } from "react-router-dom";
+import { SuessToast } from "../../../helpers/Toast";
 const SpecificProductDetails = ({ ProductDetailsData }) => {
+  const { id } = useParams();
+
   const {
     name,
     description,
@@ -24,7 +29,20 @@ const SpecificProductDetails = ({ ProductDetailsData }) => {
     { id: 4, size: "L" },
     { id: 5, size: "XL" },
   ];
+  const [AddtoCart] = useAddtoCartMutation();
 
+  // handleAddtoCart
+  const handleAddtoCart = async () => {
+    try {
+      const resposne = await AddtoCart({ product: id });
+      if (resposne) {
+        SuessToast("add To cart Sucessful");
+      }
+      console.log(resposne);
+    } catch (error) {
+      console.error("error from p roduct details page", error);
+    }
+  };
   return (
     <div>
       <div className="">
@@ -106,8 +124,11 @@ const SpecificProductDetails = ({ ProductDetailsData }) => {
             </span>
           </div>
 
-          <button className="py-[12px] px-[48px] bg-redDB4444 rounded-[5px] border-none font-popins font-medium text-white_FFFFFF text-[16px]">
-            Buy Now
+          <button
+            className="py-[12px] px-[48px] bg-redDB4444 rounded-[5px] border-none font-popins font-medium text-white_FFFFFF text-[16px]"
+            onClick={handleAddtoCart}
+          >
+            Add to Cart
           </button>
 
           <div className="border-2 border-x-gray-300 rounded  py-1 px-3 cursor-pointer hover:bg-red-500 hover:text-white_FFFFFF ">

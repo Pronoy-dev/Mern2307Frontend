@@ -7,11 +7,23 @@ import { addtoCart } from "../../Features/AllSlice/productSlice";
 import { useDispatch } from "react-redux";
 import Star from "./Star";
 import { Link, useNavigate } from "react-router-dom";
+import { useAddtoCartMutation } from "../../Features/Api/exclusiveApi";
+import { SuessToast } from "../../helpers/Toast";
 const ProductCard = ({ itemData }) => {
+  const [AddtoCart] = useAddtoCartMutation();
   const dispatch = useDispatch();
   // handleaddtoCart funtion implement
-  const handleaddtoCart = (item) => {
-    dispatch(addtoCart(item));
+  const handleaddtoCart = async ({ _id }) => {
+    try {
+      const reponse = await AddtoCart({
+        product: _id,
+      });
+      if (reponse) {
+        SuessToast("Add to cart SucessFull");
+      }
+    } catch (error) {
+      console.warn("error from product cart ", error);
+    }
   };
   return (
     <div className="mt-10 ">
