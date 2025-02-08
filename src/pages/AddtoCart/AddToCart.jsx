@@ -36,7 +36,9 @@ const AddToCart = () => {
       console.error("error from cart remove cart funtion", error);
     }
   };
-  console.log(data?.data);
+  const userbioData = data?.data?.userCartItem[0]?.user;
+
+  localStorage.setItem("userinfo", JSON.stringify(userbioData));
 
   return (
     <div className="my-20">

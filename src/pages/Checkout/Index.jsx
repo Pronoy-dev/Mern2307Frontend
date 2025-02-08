@@ -1,9 +1,69 @@
-import React from "react";
+import React, { useState } from "react";
 import { useGetuserCartItemQuery } from "../../Features/Api/exclusiveApi";
-
+import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 const Checkout = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
   const { data, isLoading, isError } = useGetuserCartItemQuery();
-  console.log(data?.data?.userCartItem);
+  const userbioData = JSON.parse(localStorage.getItem("userinfo"));
+
+  const [userInput, setuserInput] = useState([
+    {
+      name: "firstName",
+    },
+    {
+      name: "lastName",
+    },
+    {
+      name: "email",
+    },
+    {
+      name: "phone",
+    },
+    {
+      name: "address1",
+    },
+    {
+      name: "address2",
+    },
+    {
+      name: "city",
+    },
+    {
+      name: "district",
+    },
+    { name: "postcode" },
+  ]);
+  const [uservalue, setuservalue] = useState({
+    firstName: userbioData?.firstName,
+    lastName: "Doe",
+    email: userbioData?.email,
+    phone: userbioData?.phoneNumber,
+    address1: "123 Main St",
+    address2: "Apt 4B",
+    city: "Dhaka",
+    district: "Dhaka",
+    postcode: 1212,
+    paymentmethod: "cash",
+  });
+
+  // handleChange funtion
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setuservalue({
+      ...uservalue,
+      [name]: value,
+    });
+  };
+  const onSubmit = (data) => {
+    console.log("data from react hook", data);
+  };
+  console.log(uservalue);
 
   return (
     <div className="container py-[100px]">
@@ -17,53 +77,53 @@ const Checkout = () => {
                 </h2>
               </div>
 
-              <form class="lg:mt-16">
+              <form class="lg:mt-16" onSubmit={handleSubmit(onSubmit)}>
                 <div>
-                  <h2 class="text-xl font-bold text-gray-800">Shipping info</h2>
+                  <h2 class="text-xl font-bold text-gray-800">
+                    Customer Details
+                  </h2>
 
                   <div class="grid sm:grid-cols-2 gap-8 mt-8">
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="Name"
-                        class="px-2 pb-2 bg-white text-gray-800 w-full text-sm border-b focus:border-blue-600 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="email"
-                        placeholder="Email address"
-                        class="px-2 pb-2 bg-white text-gray-800 w-full text-sm border-b focus:border-blue-600 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="Street address"
-                        class="px-2 pb-2 bg-white text-gray-800 w-full text-sm border-b focus:border-blue-600 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="City"
-                        class="px-2 pb-2 bg-white text-gray-800 w-full text-sm border-b focus:border-blue-600 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="State"
-                        class="px-2 pb-2 bg-white text-gray-800 w-full text-sm border-b focus:border-blue-600 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="number"
-                        placeholder="Postal code"
-                        class="px-2 pb-2 bg-white text-gray-800 w-full text-sm border-b focus:border-blue-600 outline-none"
-                      />
-                    </div>
+                    {userInput?.map(({ name }) => {
+                      return (
+                        <div>
+                          <input
+                            type={
+                              name == "postcode"
+                                ? "number"
+                                : name == "phone"
+                                ? "number"
+                                : name == "email"
+                                ? "email"
+                                : "text"
+                            }
+                            placeholder={`Enter Your ${name}`}
+                            defaultValue={uservalue[name]}
+                            {...register(name, {
+                              required: name === "postcode" ? false : true,
+                              pattern:
+                                name === "email"
+                                  ? /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+                                  : undefined, // Email pattern
+                            })}
+                            onChange={handleChange}
+                            onFocus={(e) =>
+                              e.target.name == "firstName" ||
+                              e.target.name == "email" ||
+                              e.target.name == "phone"
+                                ? e.target.value
+                                : (e.target.value = "")
+                            }
+                            class="px-2 pb-2 bg-white text-gray-800 w-full text-sm border-b focus:border-blue-600 outline-none"
+                          />
+                          {errors[name] && (
+                            <span className="text-red-500 mt-2">
+                              This {name} is required *
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -125,14 +185,15 @@ const Checkout = () => {
                 </div>
 
                 <div class="flex flex-wrap gap-4 mt-8">
-                  <button
+                  <Link
+                    to={"/addtocart"}
                     type="button"
                     class="min-w-[150px] px-6 py-3.5 text-sm bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
                   >
                     Back
-                  </button>
+                  </Link>
                   <button
-                    type="button"
+                    type="submit"
                     class="min-w-[150px] px-6 py-3.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     Confirm payment $240
@@ -184,10 +245,7 @@ const Checkout = () => {
 
                 <div class="lg:absolute lg:left-0 lg:bottom-0 bg-gray-200 w-full p-4">
                   <h4 class="flex flex-wrap gap-4 text-sm text-gray-800 font-bold">
-                    Total{" "}
-                    <span class="ml-auto">
-                      ${data?.data?.totalPrice}
-                    </span>
+                    Total <span class="ml-auto">${data?.data?.totalPrice}</span>
                   </h4>
                 </div>
               </div>
