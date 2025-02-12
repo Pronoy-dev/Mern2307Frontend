@@ -18,10 +18,6 @@ const AddToCart = () => {
   const { data, isLoading, isError } = useGetuserCartItemQuery();
   const [removeCart] = useRemoveCartMutation();
 
-  const { totalamount, totalItem, value } = useSelector(
-    (state) => state.cartproduct
-  );
-
   /**
    * handleremoveCart funtion implement
    * @param ({item})
@@ -37,8 +33,12 @@ const AddToCart = () => {
     }
   };
   const userbioData = data?.data?.userCartItem[0]?.user;
-
-  localStorage.setItem("userinfo", JSON.stringify(userbioData));
+  useEffect(() => {
+    if (data?.data) {
+      localStorage.setItem("userinfo", JSON.stringify(userbioData));
+      localStorage.setItem("CartTotalItem", JSON.stringify(data?.data));
+    }
+  }, [data]);
 
   return (
     <div className="my-20">

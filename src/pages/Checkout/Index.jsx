@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { useGetuserCartItemQuery } from "../../Features/Api/exclusiveApi";
+import {
+  useGetuserCartItemQuery,
+  usePlaceOrderMutation,
+} from "../../Features/Api/exclusiveApi";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 const Checkout = () => {
@@ -7,9 +10,11 @@ const Checkout = () => {
     register,
     handleSubmit,
     watch,
+    resetField,
     formState: { errors },
   } = useForm();
   const { data, isLoading, isError } = useGetuserCartItemQuery();
+  const [placeOrder, { isLoading: orderLoading }] = usePlaceOrderMutation();
   const userbioData = JSON.parse(localStorage.getItem("userinfo"));
 
   const [userInput, setuserInput] = useState([
@@ -49,7 +54,7 @@ const Checkout = () => {
     city: "Dhaka",
     district: "Dhaka",
     postcode: 1212,
-    paymentmethod: "cash",
+    paymentmethod: "",
   });
 
   // handleChange funtion
@@ -60,10 +65,35 @@ const Checkout = () => {
       [name]: value,
     });
   };
-  const onSubmit = (data) => {
-    console.log("data from react hook", data);
+  const onSubmit = async (data) => {
+    try {
+      const orderData = {
+        customerinfo: {
+          firstName: uservalue.firstName,
+          lastName: uservalue.lastName,
+          email: uservalue.email,
+          phone: parseInt(uservalue.phone),
+          address1: uservalue.address1,
+          address2: uservalue.address2,
+          city: uservalue.city,
+          district: uservalue.district,
+          postcode: uservalue.postcode || 1212,
+        },
+        paymentinfo: {
+          paymentmethod: uservalue.paymentmethod,
+          ispaid: false,
+        },
+      };
+      const response = await placeOrder(orderData).unwrap();
+      if (response.url) {
+        window.location.href = response.url;
+      }
+    } catch (error) {
+      console.error("error from place order", error);
+    } finally {
+      // resetField();
+    }
   };
-  console.log(uservalue);
 
   return (
     <div className="container py-[100px]">
@@ -133,53 +163,58 @@ const Checkout = () => {
                   </h2>
 
                   <div class="grid gap-4 sm:grid-cols-2 mt-4">
-                    <div class="flex items-center">
-                      <label for="card" class=" flex gap-2 cursor-pointer">
-                        <img
-                          src="https://readymadeui.com/images/visa.webp"
-                          class="w-12"
-                          alt="card1"
-                        />
-                        <img
-                          src="https://readymadeui.com/images/american-express.webp"
-                          class="w-12"
-                          alt="card2"
-                        />
-                        <img
-                          src="https://readymadeui.com/images/master.webp"
-                          class="w-12"
-                          alt="card3"
-                        />
-                      </label>
+                    <div
+                      class="flex items-center"
+                      onClick={() =>
+                        setuservalue({ ...uservalue, paymentmethod: "online" })
+                      }
+                    >
+                      {uservalue.paymentmethod == "online" ? (
+                        <label for="card" class=" flex gap-2 cursor-pointer">
+                          <img
+                            src="https://readymadeui.com/images/american-express.webp"
+                            class="w-32 h-16"
+                            alt="card2"
+                          />
+                        </label>
+                      ) : (
+                        <label for="card" class=" flex gap-2 cursor-pointer">
+                          <img
+                            src="https://readymadeui.com/images/visa.webp"
+                            class="w-12"
+                            alt="card1"
+                          />
+                          <img
+                            src="https://readymadeui.com/images/american-express.webp"
+                            class="w-12"
+                            alt="card2"
+                          />
+                          <img
+                            src="https://readymadeui.com/images/master.webp"
+                            class="w-12"
+                            alt="card3"
+                          />
+                        </label>
+                      )}
                     </div>
 
                     <div class="flex items-center">
                       <button
+                        onClick={() =>
+                          setuservalue({
+                            ...uservalue,
+                            paymentmethod: "cash",
+                          })
+                        }
                         type="button"
-                        class="px-5 py-3 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-orange-700 hover:bg-orange-800 active:bg-orange-700"
+                        className={
+                          uservalue.paymentmethod == "cash"
+                            ? "px-5 py-3 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-green-700 hover:bg-green-800 active:bg-orange-700"
+                            : "px-5 py-3 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-orange-700 hover:bg-orange-800 active:bg-orange-700"
+                        }
                       >
                         Cash On Delivery
                       </button>
-                    </div>
-                  </div>
-
-                  <div class="grid gap-8 mt-8">
-                    <div class="flex items-center">
-                      <input
-                        id="remember-me"
-                        name="remember-me"
-                        type="checkbox"
-                        class="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label for="remember-me" class="ml-3 block text-sm">
-                        I accept the{" "}
-                        <a
-                          href="javascript:void(0);"
-                          class="text-blue-600 font-semibold hover:underline ml-1"
-                        >
-                          Terms and Conditions
-                        </a>
-                      </label>
                     </div>
                   </div>
                 </div>
@@ -187,8 +222,7 @@ const Checkout = () => {
                 <div class="flex flex-wrap gap-4 mt-8">
                   <Link
                     to={"/addtocart"}
-                    type="button"
-                    class="min-w-[150px] px-6 py-3.5 text-sm bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                    className="flex items-center justify-center min-w-[150px] px-6 py-3.5 text-sm bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
                   >
                     Back
                   </Link>
@@ -196,7 +230,7 @@ const Checkout = () => {
                     type="submit"
                     class="min-w-[150px] px-6 py-3.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Confirm payment $240
+                    {orderLoading ? "loading .." : "Confirm payment"}
                   </button>
                 </div>
               </form>

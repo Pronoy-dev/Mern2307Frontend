@@ -44,6 +44,14 @@ export const exlusiveApi = createApi({
       }),
       invalidatesTags: ["cartitem"],
     }),
+
+    placeOrder: builder.mutation({
+      query: (data) => ({
+        url: `/placeorder`,
+        method: "post",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -57,4 +65,5 @@ export const {
   useAddtoCartMutation,
   useGetuserCartItemQuery,
   useRemoveCartMutation,
+  usePlaceOrderMutation,
 } = exlusiveApi;
